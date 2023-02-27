@@ -1,2 +1,2 @@
 # hello-world-composite-action
-To practice GitHub Actions
+Created to practice GitHub Actions
