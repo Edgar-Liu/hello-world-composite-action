@@ -8,5 +8,5 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: echo Hello ${{ inputs.who-to-greet }}.
+    - run: echo "${{ vars.GITHUB_REPOSITORY	}} says Helloworld."
       shell: bash
