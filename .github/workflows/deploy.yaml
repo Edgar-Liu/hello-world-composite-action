@@ -1,0 +1,49 @@
+name: Deploy Astro to AWS environment
+
+on:
+  push:
+    branches: 
+      - main
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    
+    steps: 
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: npm install and build
+        run: |
+          cd client
+          cat > .env << EOF
+          VITE_SERVER_URL="https://api.astro.swiftoffice.org"
+          EOF
+          npm install
+          npm run build
+      
+      - name: Upload to S3
+        # No requirement to update the S3 Bucket name, hence leaving it as the legacy name (lss-currency-web-staging)
+        run: |
+          aws s3 sync client/dist/. s3://lss-currency-web-staging 
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'ap-southeast-1'
+  
+  backend: 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: AWS SSM Command
+        uses: peterkimzz/aws-ssm-send-command@master
+        id: ssm
+        with:
+          aws-region: ${{ secrets.AWS_REGION }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          instance-ids: ${{ secrets.INSTANCE_ID }}
+
+          working-directory: /usr/bin
+          command: sudo ./script.sh

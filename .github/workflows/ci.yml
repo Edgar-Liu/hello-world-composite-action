@@ -1,0 +1,55 @@
+name: CI
+# CI workflow for astro [lss-currency-app]
+on:
+  workflow_call:
+    inputs: 
+      environment_name:
+        type: string
+        required: true
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: ${{ inputs.environment_name }}
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    name: Test & Build
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install npm dependencies 
+        run: |        
+          cd client
+          npm install
+          cd ..
+
+      - name: Lint Test
+        run: npm run lint
+
+    #   - name: Unit Test
+    #     run: npm run test:unit
+
+      - name: Perform npm run build
+        run: |
+          pwd
+          cd client
+          cat > .env << EOF
+          VITE_SERVER_URL="https://api.astro.swiftoffice.org"
+          EOF
+          npm run build
+
+      - name: Create build-output artifact
+        uses: actions/upload-artifact@master
+        with:
+          name: build-output
+          path: ./dist/

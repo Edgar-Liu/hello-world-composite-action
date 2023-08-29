@@ -1,0 +1,25 @@
+name: staging
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: Feature & Unit Tests # Builds and tests the code 
+    uses: ./.github/workflows/ci.yml
+    with:
+      environment_name: staging
+
+  # cd:
+  #   name: Deployment to AWS Account for staging # Deploys the code to AWS, and invalidates the CloudFront cache
+  #   needs: ci
+  #   uses: ./.github/workflows/cd.yml
+  #   with:
+  #     environment_name: staging
+  #   secrets:
+  #     aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #     aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #     aws_bucket: ${{ secrets.AWS_BUCKET }}
+  #     aws_region: ${{ secrets.AWS_REGION }}
+  #     CF_DISTRIBUTION: ${{ secrets.CF_DISTRIBUTION }}

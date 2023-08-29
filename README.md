@@ -1,2 +1,1 @@
-# hello-world-composite-action
-Created to practice GitHub Actions
+<h1>This repository is created for Edgar's practice of Github workflows / actions"</h1>
